@@ -1,0 +1,57 @@
+# created by virtualenv automatically
+
+# Python bytecode files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual environment
+venv/
+.env/
+.venv/
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# py2app
+dist/
+build/
+*.app/
+
+# PyInstaller
+*.spec
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# pytest
+.cache/
+
+# mypy
+.mypy_cache/
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# dotenv
+.env
+
+# myproject
+*.egg-info/
+*.egg/
+*.log
+
+# VSCode
+.vscode/
+
+# Miscellaneous
+*.swp
+*~
