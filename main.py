@@ -46,9 +46,6 @@ class HTMLUpdaterApp(QWidget):
         if not name_surname.strip():
             raise ValueError("Name and surname cannot be empty.")
 
-        if len(name_surname) > 25:
-            raise ValueError("Name and surname cannot be more than 25 characters.")
-
         return name_surname
 
     def get_valid_url(self, url):
