@@ -1,74 +1,90 @@
+import sys
 import re
 from bs4 import BeautifulSoup
-import tkinter as tk
-from tkinter import messagebox, filedialog
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QFileDialog, QMessageBox
 
 card = "automation.html"
 
-def get_valid_name(name_surname):
-    if not name_surname.strip():
-        raise ValueError("Name and surname cannot be empty.")
+class HTMLUpdaterApp(QWidget):
+    def __init__(self):
+        super().__init__()
 
-    if len(name_surname) > 25:
-        raise ValueError("Name and surname cannot be more than 25 characters.")
+        self.init_ui()
 
-    if not re.fullmatch(r"[A-Za-z\sçöğüşıÇÖĞÜŞİ]+", name_surname):
-        raise ValueError("Name and surname should only contain letters and spaces.")
+    def init_ui(self):
+        # Layout
+        layout = QVBoxLayout()
 
-    return name_surname
+        # Name label and input
+        self.label_name = QLabel("Enter your name and surname:")
+        self.label_name.setStyleSheet("font-family: Arial; font-size: 16px;")
+        layout.addWidget(self.label_name)
+        self.entry_name = QLineEdit()
+        self.entry_name.setStyleSheet("font-family: Arial; font-size: 14px;")
+        layout.addWidget(self.entry_name)
 
+        # URL label and input
+        self.label_url = QLabel("Enter the new URL for the image:")
+        self.label_url.setStyleSheet("font-family: Arial; font-size: 16px;")
+        layout.addWidget(self.label_url)
+        self.entry_url = QLineEdit()
+        self.entry_url.setStyleSheet("font-family: Arial; font-size: 14px;")
+        layout.addWidget(self.entry_url)
 
+        # Submit button
+        self.submit_button = QPushButton("Submit")
+        self.submit_button.setStyleSheet("font-family: Arial; font-size: 16px; background-color: #add8e6;")
+        self.submit_button.clicked.connect(self.submit)
+        layout.addWidget(self.submit_button)
 
-def get_valid_url(url):
-    if not url.strip():
-        raise ValueError("URL cannot be empty.")
-    return url
+        # Set layout and window size
+        self.setLayout(layout)
+        self.setWindowTitle("HTML Updater")
+        self.resize(400, 200)  # Set initial window size
 
-def update_html(name_surname, url, save_path):
-    with open(card, 'r', encoding='utf-8') as html_file:
-        content = html_file.read()
+    def get_valid_name(self, name_surname):
+        if not name_surname.strip():
+            raise ValueError("Name and surname cannot be empty.")
 
-    soup = BeautifulSoup(content, 'html.parser')
-    tags = soup.find("img")
+        if len(name_surname) > 25:
+            raise ValueError("Name and surname cannot be more than 25 characters.")
 
-    tags['alt'] = name_surname
-    tags['src'] = url
-    print("Updated <img> tag:", tags)
+        return name_surname
 
-    updated_content = soup.prettify()
+    def get_valid_url(self, url):
+        if not url.strip():
+            raise ValueError("URL cannot be empty.")
+        return url
 
-    with open(save_path, 'w', encoding='utf-8') as html_file:
-        html_file.write(updated_content)
+    def update_html(self, name_surname, url, save_path):
+        with open(card, 'r', encoding='utf-8') as html_file:
+            content = html_file.read()
 
-    print("Updated HTML:", updated_content)
+        soup = BeautifulSoup(content, 'html.parser')
+        tags = soup.find("img")
 
+        tags['alt'] = name_surname
+        tags['src'] = url
 
-def submit():
-    try:
-        name_surname = get_valid_name(entry_name.get())
-        url = get_valid_url(entry_url.get())
-        save_path = filedialog.asksaveasfilename(defaultextension=".html", filetypes=[("HTML files", "*.html")])
-        if not save_path:
-            return
-        update_html(name_surname, url, save_path)
-        messagebox.showinfo("Success", "HTML file updated and saved successfully.")
-    except Exception as e:
-        messagebox.showerror("Error", str(e))
+        updated_content = soup.prettify()
 
+        with open(save_path, 'w', encoding='utf-8') as html_file:
+            html_file.write(updated_content)
 
+    def submit(self):
+        try:
+            name_surname = self.get_valid_name(self.entry_name.text())
+            url = self.get_valid_url(self.entry_url.text())
+            save_path, _ = QFileDialog.getSaveFileName(self, "Save File", "", "HTML Files (*.html)")
+            if not save_path:
+                return
+            self.update_html(name_surname, url, save_path)
+            QMessageBox.information(self, "Success", "HTML file updated and saved successfully.")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", str(e))
 
-root = tk.Tk()
-root.title("HTML Updater")
-
-tk.Label(root, text="Enter your name and surname:").grid(row=0, column=0, padx=10, pady=5)
-entry_name = tk.Entry(root, width=40)
-entry_name.grid(row=0, column=1, padx=10, pady=5)
-
-tk.Label(root, text="Enter the new URL for the image:").grid(row=1, column=0, padx=10, pady=5)
-entry_url = tk.Entry(root, width=40)
-entry_url.grid(row=1, column=1, padx=10, pady=5)
-
-submit_button = tk.Button(root, text="Submit", command=submit)
-submit_button.grid(row=2, column=0, columnspan=2, pady=10)
-
-root.mainloop()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    ex = HTMLUpdaterApp()
+    ex.show()
+    sys.exit(app.exec_())
