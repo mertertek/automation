@@ -82,7 +82,6 @@ class HTMLUpdaterApp(QWidget):
             QMessageBox.information(self, "Success", "HTML file updated and saved successfully.")
         except Exception as e:
             QMessageBox.critical(self, "Error", str(e))
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = HTMLUpdaterApp()
